@@ -1,4 +1,6 @@
-﻿namespace CellularAutomata
+﻿using System;
+
+namespace CellularAutomata
 {
 	public class Program
 	{
@@ -10,7 +12,7 @@
 			// False - gra w zycie
 			bool mrowka = false;
 
-			int iter = 0;
+			int iter = 10;
 
 			string input = "";
 			string output = "";
@@ -44,6 +46,50 @@
 			}
 
 			//! End wczytanie przelacznikow
+
+			// DEBUG
+			mrowka = false;
+			input = "Wejscie.txt";
+			output = "Wyjscie.txt";
+			// END DEBUG
+
+			// Stworzenie planszy
+
+			Plansza plansza;
+
+			if (!string.IsNullOrEmpty(input))
+			{
+				plansza = OperacjeIO.WczytajPlansze(input, mrowka);
+			}
+			else
+			{
+				plansza = new Plansza(8, 8);
+				Operacje.LosujPlansze(plansza, mrowka);
+			}
+
+			Operacje.WypiszPlansze(plansza);
+
+
+			for (int i = 0; i < iter; i++)
+			{
+				Console.WriteLine($"\nPokolenie {i + 1}");
+				Console.WriteLine("Wpisz cokolwiek, by zobaczyc nastepne pokolenie");
+				_ = Console.ReadKey();
+				Console.Clear();
+
+				plansza = Operacje.NastepnePokolenie(plansza);
+
+				Operacje.WypiszPlansze(plansza);
+			}
+
+			if (!string.IsNullOrEmpty(output))
+			{
+				OperacjeIO.ZapiszPlansze(output, plansza, mrowka);
+			}
+			else
+			{
+				Console.WriteLine("Wykonano wszystkie iteracje, bez zapisu do pliku.");
+			}
 		}
 	}
 }
