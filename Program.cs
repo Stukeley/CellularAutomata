@@ -7,12 +7,13 @@ namespace CellularAutomata
 		public static void Main(string[] args)
 		{
 			//! Wczytanie przelacznikow
+			// Przelaczniki maja ustawione bazowe wartosci w przypadku gdy nie sa podane
 
 			// True - mrowka langtona
 			// False - gra w zycie
 			bool mrowka = false;
 
-			int iter = 10;
+			int iter = 20;
 
 			string input = "";
 			string output = "";
@@ -48,43 +49,69 @@ namespace CellularAutomata
 			//! End wczytanie przelacznikow
 
 			// DEBUG
-			mrowka = false;
-			input = "Wejscie.txt";
-			output = "Wyjscie.txt";
+#if DEBUG
+			mrowka = true;
+			input = "WejscieMrowka.txt";
+			output = "WyjscieMrowka.txt";
+#endif
 			// END DEBUG
 
 			// Stworzenie planszy
 
 			Plansza plansza;
+			Mrowka mrowek;
 
 			if (!string.IsNullOrEmpty(input))
 			{
 				plansza = OperacjeIO.WczytajPlansze(input, mrowka);
+				mrowek = OperacjeIO.WczytajMrowke(input);
 			}
 			else
 			{
 				plansza = new Plansza(8, 8);
 				Operacje.LosujPlansze(plansza, mrowka);
+				mrowek = Operacje.LosujMrowke(plansza);
 			}
 
-			Operacje.WypiszPlansze(plansza);
-
-
-			for (int i = 0; i < iter; i++)
+			if (mrowka)
 			{
-				Console.WriteLine($"\nPokolenie {i + 1}");
-				Console.WriteLine("Wpisz cokolwiek, by zobaczyc nastepne pokolenie");
-				_ = Console.ReadKey();
-				Console.Clear();
+				for (int i = 0; i < iter; i++)
+				{
+					Operacje.WypiszPlanszeMrowka(plansza, mrowek);
 
-				plansza = Operacje.NastepnePokolenie(plansza);
+					Console.WriteLine($"\nIteracja {i + 1}");
+					Console.WriteLine("Wpisz cokolwiek, by zobaczyc nastepny ruch mrowki");
+					_ = Console.ReadKey();
+					Console.Clear();
 
-				Operacje.WypiszPlansze(plansza);
+					plansza = Operacje.NastepnaIteracja(plansza, mrowek);
+				}
+			}
+			else
+			{
+				for (int i = 0; i < iter; i++)
+				{
+					Operacje.WypiszPlansze(plansza);
+
+					Console.WriteLine($"\nPokolenie {i + 1}");
+					Console.WriteLine("Wpisz cokolwiek, by zobaczyc nastepne pokolenie");
+					_ = Console.ReadKey();
+					Console.Clear();
+
+					plansza = Operacje.NastepnePokolenie(plansza);
+				}
 			}
 
 			if (!string.IsNullOrEmpty(output))
 			{
-				OperacjeIO.ZapiszPlansze(output, plansza, mrowka);
+				if (mrowka)
+				{
+					OperacjeIO.ZapiszPlanszeMrowka(output, plansza, mrowek);
+				}
+				else
+				{
+					OperacjeIO.ZapiszPlansze(output, plansza);
+				}
 			}
 			else
 			{

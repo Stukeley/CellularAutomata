@@ -2,12 +2,12 @@
 {
 	public enum Kierunek
 	{
-		Prawo, Lewo, Gora, Dol
+		Gora, Lewo, Dol, Prawo
 	}
 
 	public class Mrowka : Pole
 	{
-		public Kierunek Kierunek { get; private set; }
+		public Kierunek Kierunek { get; set; }
 
 		public Mrowka(int x, int y, Kierunek kierunek) : base(x, y)
 		{

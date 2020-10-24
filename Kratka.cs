@@ -2,7 +2,7 @@
 {
 	public enum Kolor
 	{
-		Bialy, Czarny
+		Czarny, Bialy
 	}
 
 	public class Kratka : Pole

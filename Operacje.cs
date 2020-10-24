@@ -10,10 +10,24 @@ namespace CellularAutomata
 
 			if (mrowka)
 			{
+				// Najpierw losujemy pozycje mrowki
+				int mrowkaX = rng.Next(0, plansza.Pola.GetLength(0));
+				int mrowkaY = rng.Next(0, plansza.Pola.GetLength(1));
+
+				// Mrowka poczatkowo obrocona w gore
+				var mrowek = new Mrowka(mrowkaX, mrowkaY, Kierunek.Gora);
+
+				plansza.Pola[mrowkaX, mrowkaY] = mrowek;
+
 				for (int i = 0; i < plansza.Pola.GetLength(0); i++)
 				{
 					for (int j = 0; j < plansza.Pola.GetLength(1); j++)
 					{
+						if ((i, j) == (mrowkaX, mrowkaY))
+						{
+							continue;
+						}
+
 						Kolor kolor = rng.Next() % 2 == 0 ? Kolor.Bialy : Kolor.Czarny;
 
 						plansza.Pola[i, j] = new Kratka(i, j, kolor);
@@ -42,31 +56,19 @@ namespace CellularAutomata
 				for (int j = 0; j < plansza.Pola.GetLength(1); j++)
 				{
 					char znak = (plansza.Pola[i, j] as Komorka).Stan == Stan.Zywa ? 'O' : 'X';
-					Console.Write(znak);
-					Console.Write(" ");
-				}
-				Console.Write("\n");
-			}
-		}
 
-		// Wypisuje plansze do Mrowki Langtona
-		public static void WypiszPlansze(Plansza plansza, Mrowka mrowka)
-		{
-			for (int i = 0; i < plansza.Pola.GetLength(0); i++)
-			{
-				for (int j = 0; j < plansza.Pola.GetLength(1); j++)
-				{
-					if (mrowka.X == i && mrowka.Y == j)
+					if (znak == 'O')
 					{
-						Console.Write('M');
-						Console.Write(" ");
+						Console.ForegroundColor = ConsoleColor.Green;
 					}
 					else
 					{
-						char znak = (plansza.Pola[i, j] as Kratka).Kolor == Kolor.Bialy ? '1' : '0';
-						Console.Write(znak);
-						Console.Write(" ");
+						Console.ForegroundColor = ConsoleColor.Red;
 					}
+
+					Console.Write(znak);
+					Console.ForegroundColor = ConsoleColor.Gray;
+					Console.Write(" ");
 				}
 				Console.Write("\n");
 			}
@@ -123,6 +125,126 @@ namespace CellularAutomata
 						(plansza.Pola[i, j] as Komorka).Stan = Stan.Martwa;
 					}
 				}
+			}
+
+			return plansza;
+		}
+
+		// Wypisuje plansze do Mrowki Langtona
+		public static void WypiszPlanszeMrowka(Plansza plansza, Mrowka mrowka)
+		{
+			for (int i = 0; i < plansza.Pola.GetLength(0); i++)
+			{
+				for (int j = 0; j < plansza.Pola.GetLength(1); j++)
+				{
+					if ((i, j) == (mrowka.X, mrowka.Y))
+					{
+						Console.ForegroundColor = ConsoleColor.Red;
+						Console.Write('M');
+					}
+					else
+					{
+						char znak = (plansza.Pola[i, j] as Kratka).Kolor == Kolor.Bialy ? '1' : '0';
+
+						if (znak == '1')
+						{
+							Console.ForegroundColor = ConsoleColor.White;
+						}
+						else
+						{
+							Console.ForegroundColor = ConsoleColor.Blue;
+						}
+
+						Console.Write(znak);
+					}
+
+					Console.ForegroundColor = ConsoleColor.Gray;
+					Console.Write(' ');
+				}
+
+				Console.Write('\n');
+			}
+		}
+
+		// Losuje mrowke w przypadku, gdy nie zostala ona podana w pliku wejsciowym
+		public static Mrowka LosujMrowke(Plansza plansza)
+		{
+			Random rng = new Random();
+
+			int mrowkaX = rng.Next(0, plansza.Pola.GetLength(0));
+			int mrowkaY = rng.Next(0, plansza.Pola.GetLength(1));
+
+			Mrowka mrowka = new Mrowka(mrowkaX, mrowkaY, Kierunek.Gora);
+
+			return mrowka;
+		}
+
+		// Porusza mrowka do przodu o jedno pole (Mrowka Langtona)
+		public static void RuchDoPrzodu(Plansza plansza, Mrowka mrowka)
+		{
+			// Obliczamy nowa pozycje mrowki bazujac na kierunku, w ktorym jest odwrocona
+
+			// Na start ustawiamy nowe wartosci na te poprzednie
+			int noweX = mrowka.X, noweY = mrowka.Y;
+			switch (mrowka.Kierunek)
+			{
+				case Kierunek.Gora:
+
+					// x-1, y bez zmian
+					noweX = (mrowka.X - 1 + plansza.Pola.GetLength(1)) % plansza.Pola.GetLength(1);
+					break;
+
+				case Kierunek.Lewo:
+
+					// y-1, x bez zmian
+					noweY = (mrowka.Y - 1 + plansza.Pola.GetLength(0)) % plansza.Pola.GetLength(0);
+					break;
+
+				case Kierunek.Dol:
+
+					// x+1, y bez zmian
+					noweX = (mrowka.X + 1 + plansza.Pola.GetLength(1)) % plansza.Pola.GetLength(1);
+					break;
+
+				case Kierunek.Prawo:
+
+					// y+1, x bez zmian
+					noweY = (mrowka.Y + 1 + plansza.Pola.GetLength(0)) % plansza.Pola.GetLength(0);
+					break;
+			}
+
+			// Ustawiamy nowa pozycje
+			mrowka.X = noweX;
+			mrowka.Y = noweY;
+		}
+
+		// Generuje nastepna iteracje planszy dla Mrowki Langtona
+		public static Plansza NastepnaIteracja(Plansza plansza, Mrowka mrowka)
+		{
+			Kratka k = plansza.Pola[mrowka.X, mrowka.Y] as Kratka;
+
+			// Sprawdzamy kolor pola, na ktorym znajduje sie mrowka
+			if (k.Kolor == Kolor.Bialy)
+			{
+				// Obrot w lewo - +1 (% sprawia ze nigdy nie "wyskoczymy" poza mozliwe kierunki) 0->1->2->3->0->1->...
+				mrowka.Kierunek = (Kierunek)((int)(mrowka.Kierunek + 1) % 4);
+
+				// Zmiana koloru pola
+				k.Kolor = Kolor.Czarny;
+
+				// Ruch do przodu
+				RuchDoPrzodu(plansza, mrowka);
+			}
+			else
+			{
+				// Obrot w prawo - -1 (musimy sie upewnic, ze Kierunek nie jest ujemny)
+				mrowka.Kierunek = mrowka.Kierunek - 1 > 0 ? mrowka.Kierunek - 1 : mrowka.Kierunek + 3;
+
+				// Zmiana koloru pola
+				k.Kolor = Kolor.Bialy;
+
+				// Ruch do przodu
+				RuchDoPrzodu(plansza, mrowka);
 			}
 
 			return plansza;
