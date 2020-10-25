@@ -30,7 +30,9 @@
 			{
 				for (int j = 0; j < Pola.GetLength(1); j++)
 				{
-					nowa.Pola[i, j] = Pola[i, j];
+					Komorka stara = this.Pola[i, j] as Komorka;
+
+					nowa.Pola[i, j] = new Komorka(i, j, stara.Stan);
 				}
 			}
 
