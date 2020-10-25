@@ -10,24 +10,10 @@ namespace CellularAutomata
 
 			if (mrowka)
 			{
-				// Najpierw losujemy pozycje mrowki
-				int mrowkaX = rng.Next(0, plansza.Pola.GetLength(0));
-				int mrowkaY = rng.Next(0, plansza.Pola.GetLength(1));
-
-				// Mrowka poczatkowo obrocona w gore
-				var mrowek = new Mrowka(mrowkaX, mrowkaY, Kierunek.Gora);
-
-				plansza.Pola[mrowkaX, mrowkaY] = mrowek;
-
 				for (int i = 0; i < plansza.Pola.GetLength(0); i++)
 				{
 					for (int j = 0; j < plansza.Pola.GetLength(1); j++)
 					{
-						if ((i, j) == (mrowkaX, mrowkaY))
-						{
-							continue;
-						}
-
 						Kolor kolor = rng.Next() % 2 == 0 ? Kolor.Bialy : Kolor.Czarny;
 
 						plansza.Pola[i, j] = new Kratka(i, j, kolor);
@@ -104,7 +90,7 @@ namespace CellularAutomata
 		// Generuje nastepne pokolenie dla danej planszy (Gra w Zycie)
 		public static Plansza NastepnePokolenie(Plansza plansza)
 		{
-			Plansza kopia = plansza;
+			Plansza kopia = plansza.KopiujPlansze();
 
 			for (int i = 0; i < plansza.Pola.GetLength(0); i++)
 			{

@@ -50,9 +50,9 @@ namespace CellularAutomata
 
 			// DEBUG
 #if DEBUG
-			mrowka = true;
-			input = "WejscieMrowka.txt";
-			output = "WyjscieMrowka.txt";
+			mrowka = false;
+			input = "Wejscie.txt";
+			output = "Wyjscie.txt";
 #endif
 			// END DEBUG
 
